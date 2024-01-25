@@ -8,12 +8,7 @@ const app = new Elysia()
   .use(
     cors({
       credentials: true,
-      allowedHeaders: [
-        'content-type',
-        'application/json',
-        'Access-Control-Allow-Origin',
-        'Access-Control-Allow-Credentials',
-      ],
+      allowedHeaders: ['content-type', 'Accept'],
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'],
       origin: ({ headers }) => {
         if (Bun.env.NODE_ENV === 'production') {
