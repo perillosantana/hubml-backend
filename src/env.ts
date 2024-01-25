@@ -14,6 +14,7 @@ const envSchema = z.object({
   VALUE_PARAGRAPH: z.string(),
   CLIENT_URL: z.string(),
   COOKIE_SECURE: z.string(),
+  CLIENT_ORIGIN: z.string(),
 })
 
 export const env = envSchema.parse(process.env)

@@ -11,7 +11,7 @@ const app = new Elysia()
       credentials: true,
       allowedHeaders: ['content-type', 'Accept'],
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'],
-      origin: env.CLIENT_URL,
+      origin: env.CLIENT_ORIGIN,
     }),
   )
   .use(authentication)
