@@ -45,6 +45,7 @@ export const authentication = new Elysia()
           httpOnly: true,
           maxAge: 4 * 86400,
           secure: Boolean(env.COOKIE_SECURE),
+          sameSite: 'none',
         })
       },
       signOut: () => {
