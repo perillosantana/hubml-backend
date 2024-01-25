@@ -1,55 +1,48 @@
 import Elysia, { Static, t } from 'elysia'
-import { UnauthorizedError } from './routes/errors/unauthorized-error'
 import jwt from '@elysiajs/jwt'
 import { env } from '@/env'
-import cookie from '@elysiajs/cookie'
+import bearer from '@elysiajs/bearer'
+import { HumanizedError } from './routes/errors/humanized-error'
 
 const jwtPayloadSchema = t.Object({
   login: t.Optional(t.String()),
 })
 
 export const authentication = new Elysia()
-  .error({
-    UNAUTHORIZED: UnauthorizedError,
-  })
-  .onError(({ code, error, set }) => {
-    switch (code) {
-      case 'UNAUTHORIZED':
-        set.status = 401
-        return { code, message: error.message }
-    }
-  })
+  .use(bearer())
   .use(
     jwt({
       name: 'jwt',
       secret: env.JWT_SECRET_KEY,
       schema: jwtPayloadSchema,
-      exp: '4d',
-      iat: new Date(),
+      exp: '1d',
     }),
   )
-  .use(cookie())
-  .derive(({ jwt, cookie, setCookie, removeCookie }) => {
+  .derive(({ jwt, bearer, set }) => {
     return {
       getCurrentUser: async () => {
-        const payload = await jwt.verify(cookie.auth)
+        if (!bearer) {
+          set.status = 401
 
-        if (!payload) {
-          throw new UnauthorizedError()
+          throw new HumanizedError({
+            status: 'error',
+            message: 'Usuário sem acesso',
+          })
         }
 
-        return payload
+        if (!(await jwt.verify(bearer))) {
+          set.status = 401
+
+          throw new HumanizedError({
+            status: 'error',
+            message: 'Usuário sem acesso',
+          })
+        }
+
+        return await jwt.verify(bearer)
       },
       signIn: async (payload: Static<typeof jwtPayloadSchema>) => {
-        setCookie('auth', await jwt.sign(payload), {
-          httpOnly: true,
-          maxAge: 4 * 86400,
-          secure: Boolean(env.COOKIE_SECURE),
-          sameSite: 'lax',
-        })
-      },
-      signOut: () => {
-        removeCookie('auth')
+        return await jwt.sign(payload)
       },
     }
   })

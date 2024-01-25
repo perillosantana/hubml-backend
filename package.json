@@ -10,6 +10,7 @@
     "build": "bun install && bun build ./src/http/server.ts --outdir ./dist --target bun --entry-naming index.js"
   },
   "dependencies": {
+    "@elysiajs/bearer": "^0.8.0",
     "@elysiajs/cookie": "^0.8.0",
     "@elysiajs/cors": "^0.8.0",
     "@elysiajs/jwt": "^0.8.0",
