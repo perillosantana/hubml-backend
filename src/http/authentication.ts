@@ -24,6 +24,8 @@ export const authentication = new Elysia()
       name: 'jwt',
       secret: env.JWT_SECRET_KEY,
       schema: jwtPayloadSchema,
+      exp: '4d',
+      iat: new Date(),
     }),
   )
   .use(cookie())
@@ -41,9 +43,7 @@ export const authentication = new Elysia()
       signIn: async (payload: Static<typeof jwtPayloadSchema>) => {
         setCookie('auth', await jwt.sign(payload), {
           httpOnly: true,
-          maxAge: 7 * 86400,
-          path: '/',
-          sameSite: 'lax',
+          maxAge: 4 * 86400,
         })
       },
       signOut: () => {
