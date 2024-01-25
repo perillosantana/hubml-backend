@@ -44,6 +44,7 @@ export const authentication = new Elysia()
         setCookie('auth', await jwt.sign(payload), {
           httpOnly: true,
           maxAge: 4 * 86400,
+          domain: 'https://hubml.com.br',
         })
       },
       signOut: () => {
