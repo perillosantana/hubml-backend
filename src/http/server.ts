@@ -3,6 +3,7 @@ import Elysia from 'elysia'
 import { authentication } from './authentication'
 import { signOut } from './routes/sign-out'
 import { signIn } from './routes/sign-in'
+import { env } from '@/env'
 
 const app = new Elysia()
   .use(
@@ -10,13 +11,7 @@ const app = new Elysia()
       credentials: true,
       allowedHeaders: ['content-type', 'Accept'],
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'],
-      origin: ({ headers }) => {
-        if (Bun.env.NODE_ENV === 'production') {
-          return headers.get('Origin') === 'https://hubml.com.br'
-        } else {
-          return true
-        }
-      },
+      origin: env.CLIENT_URL,
     }),
   )
   .use(authentication)

@@ -12,6 +12,8 @@ const envSchema = z.object({
   PORT: z.string().default('3000'),
   VALUE_GENERATION: z.string(),
   VALUE_PARAGRAPH: z.string(),
+  CLIENT_URL: z.string(),
+  COOKIE_SECURE: z.string(),
 })
 
 export const env = envSchema.parse(process.env)
