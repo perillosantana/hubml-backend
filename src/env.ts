@@ -15,6 +15,7 @@ const envSchema = z.object({
   CLIENT_URL: z.string(),
   COOKIE_SECURE: z.string(),
   CLIENT_ORIGIN: z.string(),
+  OPENAI_API_KEY: z.string(),
 })
 
 export const env = envSchema.parse(process.env)

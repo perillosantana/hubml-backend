@@ -20,7 +20,7 @@ export const authentication = new Elysia()
   )
   .derive(({ jwt, bearer, set }) => {
     return {
-      getCurrentUser: async () => {
+      getLogin: async () => {
         if (!bearer) {
           set.status = 401
 
@@ -30,7 +30,9 @@ export const authentication = new Elysia()
           })
         }
 
-        if (!(await jwt.verify(bearer))) {
+        const user = await jwt.verify(bearer)
+
+        if (!user) {
           set.status = 401
 
           throw new HumanizedError({
@@ -39,7 +41,7 @@ export const authentication = new Elysia()
           })
         }
 
-        return await jwt.verify(bearer)
+        return user.login || ''
       },
       signIn: async (payload: Static<typeof jwtPayloadSchema>) => {
         return await jwt.sign(payload)

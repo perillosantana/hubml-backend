@@ -3,6 +3,15 @@ import Elysia from 'elysia'
 import { authentication } from './authentication'
 import { signIn } from './routes/sign-in'
 import { env } from '@/env'
+import { getUser } from './routes/get-user'
+import { createUser } from './routes/create-user'
+import { updateUser } from './routes/update-user'
+import { getOrders } from './routes/get-orders'
+import { getMlToken } from './routes/get-ml-token'
+import { getMlProducts } from './routes/get-ml-products'
+import { getMlProduct } from './routes/get-ml-product'
+import { createDescription } from './routes/create-description'
+import { getMetrics } from './routes/get-metrics'
 
 const app = new Elysia()
   .use(
@@ -13,16 +22,21 @@ const app = new Elysia()
       origin: env.CLIENT_ORIGIN,
     }),
   )
+  .get('/robots.txt', () => 'User-agent: *\n\nDisallow: /')
   .use(authentication)
   .use(signIn)
-  .onBeforeHandle(async ({ getCurrentUser }) => {
-    await getCurrentUser()
+  .onBeforeHandle(async ({ getLogin }) => {
+    await getLogin()
   })
-  .get('/user', async ({ getCurrentUser }) => {
-    const user = await getCurrentUser()
-
-    return user
-  })
+  .use(getUser)
+  .use(createUser)
+  .use(updateUser)
+  .use(getOrders)
+  .use(getMlToken)
+  .use(getMlProducts)
+  .use(getMlProduct)
+  .use(createDescription)
+  .use(getMetrics)
 
 app.listen(3003)
 
