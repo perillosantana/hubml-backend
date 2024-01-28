@@ -13,7 +13,6 @@ const envSchema = z.object({
   VALUE_GENERATION: z.string(),
   VALUE_PARAGRAPH: z.string(),
   CLIENT_URL: z.string(),
-  COOKIE_SECURE: z.string(),
   CLIENT_ORIGIN: z.string(),
   OPENAI_API_KEY: z.string(),
 })

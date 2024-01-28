@@ -12,6 +12,7 @@ import { getMlProducts } from './routes/get-ml-products'
 import { getMlProduct } from './routes/get-ml-product'
 import { createDescription } from './routes/create-description'
 import { getMetrics } from './routes/get-metrics'
+import { updateMlProduct } from './routes/update-ml-product'
 
 const app = new Elysia()
   .use(
@@ -37,6 +38,7 @@ const app = new Elysia()
   .use(getMlProduct)
   .use(createDescription)
   .use(getMetrics)
+  .use(updateMlProduct)
 
 app.listen(3003)
 

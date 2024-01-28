@@ -8,7 +8,7 @@ import { orders } from '@/db/schema'
 export const getOrders = new Elysia().use(authentication).get(
   '/orders',
   async ({ getLogin, query }) => {
-    const perPage = 5
+    const perPage = 10
 
     const login = await getLogin()
 

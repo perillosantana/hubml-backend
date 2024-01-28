@@ -160,6 +160,10 @@ class MercadoLivreAPI {
   }
 
   async updateProduct({ description, id, login }: UpdateProductProps) {
+    const mercadoLivreAuth = new MercadoLivreAuth()
+
+    await mercadoLivreAuth.pingMercadoLivre({ login })
+
     const user = await db.query.users.findFirst({
       columns: {
         accessToken: true,
