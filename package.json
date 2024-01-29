@@ -19,6 +19,7 @@
     "drizzle-orm": "^0.29.3",
     "drizzle-typebox": "^0.1.1",
     "elysia": "latest",
+    "mercadopago": "^2.0.6",
     "openai": "^4.26.0",
     "postgres": "^3.4.3",
     "zod": "^3.22.4"
