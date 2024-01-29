@@ -1,6 +1,6 @@
 import { env } from '@/env'
 import Elysia from 'elysia'
-import MercadoPagoConfig, { Payment } from 'mercadopago'
+import { MercadoPagoConfig, Payment } from 'mercadopago'
 
 type RequestBodyResult = {
   action: string
@@ -14,15 +14,15 @@ type RequestBodyResult = {
   type: string
   user_id: number
 }
-
-const client = new MercadoPagoConfig({
-  accessToken: env.MP_TOKEN,
-})
-const payment = new Payment(client)
-
 export const getPaymentAuthorized = new Elysia().post(
   '/payment-authorized',
   async ({ body }) => {
+    const client = new MercadoPagoConfig({
+      accessToken: env.MP_TOKEN,
+    })
+
+    const payment = new Payment(client)
+
     const result = body as RequestBodyResult
 
     if (!result) {
