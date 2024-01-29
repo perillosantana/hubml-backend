@@ -13,6 +13,7 @@ import { getMlProduct } from './routes/get-ml-product'
 import { createDescription } from './routes/create-description'
 import { getMetrics } from './routes/get-metrics'
 import { updateMlProduct } from './routes/update-ml-product'
+import { getPaymentAuthorized } from './routes/get-payment-authorized'
 
 const app = new Elysia()
   .use(
@@ -24,6 +25,7 @@ const app = new Elysia()
     }),
   )
   .get('/robots.txt', () => 'User-agent: *\n\nDisallow: /')
+  .use(getPaymentAuthorized)
   .use(authentication)
   .use(signIn)
   .onBeforeHandle(async ({ getLogin }) => {
