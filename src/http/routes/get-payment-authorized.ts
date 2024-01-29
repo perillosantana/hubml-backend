@@ -17,17 +17,19 @@ type RequestBodyResult = {
 export const getPaymentAuthorized = new Elysia().post(
   '/payment-authorized',
   async ({ body }) => {
+    const client = new MercadoPagoConfig({
+      accessToken: env.MP_TOKEN,
+      options: { timeout: 5000 },
+    })
+
+    const payment = new Payment(client)
+
     const result = body as RequestBodyResult
 
     if (!result) {
       return {}
     }
 
-    const client = new MercadoPagoConfig({
-      accessToken: env.MP_TOKEN,
-      options: { timeout: 5000 },
-    })
-    const payment = new Payment(client)
     const getPayment = await payment.get({ id: result.data.id })
     return getPayment
   },
