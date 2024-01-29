@@ -18,7 +18,7 @@ export const getPaymentAuthorized = new Elysia().post(
   '/payment-authorized',
   async ({ body }) => {
     const client = new MercadoPagoConfig({
-      accessToken: env.MP_TOKEN,
+      accessToken: 'TESTE',
       options: { timeout: 5000 },
     })
 
