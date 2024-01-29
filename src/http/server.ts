@@ -16,6 +16,7 @@ import { updateMlProduct } from './routes/update-ml-product'
 import { getPaymentAuthorized } from './routes/get-payment-authorized'
 
 const app = new Elysia()
+  .use(getPaymentAuthorized)
   .use(
     cors({
       credentials: true,
@@ -25,7 +26,6 @@ const app = new Elysia()
     }),
   )
   .get('/robots.txt', () => 'User-agent: *\n\nDisallow: /')
-  .use(getPaymentAuthorized)
   .use(authentication)
   .use(signIn)
   .onBeforeHandle(async ({ getLogin }) => {
