@@ -22,6 +22,8 @@ export const updateUser = new Elysia().use(authentication).patch(
     if (body.password) {
       const password = await Bun.password.hash(body.password)
       body.password = password
+    } else {
+      delete body.password
     }
 
     if (body.phone) {

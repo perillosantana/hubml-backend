@@ -2,7 +2,7 @@ import Elysia, { t } from 'elysia'
 import { authentication } from '../authentication'
 import { db } from '@/db/connection'
 import { z } from 'zod'
-import { and, count, eq } from 'drizzle-orm'
+import { and, count, eq, sum } from 'drizzle-orm'
 import { orders } from '@/db/schema'
 
 export const getOrders = new Elysia().use(authentication).get(
@@ -39,6 +39,10 @@ export const getOrders = new Elysia().use(authentication).get(
       .select({ count: count() })
       .from(baseQuery.as('baseQuery'))
 
+    const [orderValue] = await db
+      .select({ value: sum(orders.value) })
+      .from(baseQuery.as('baseQuery'))
+
     const allOrders = await baseQuery.offset(pageIndex * perPage).limit(perPage)
 
     const result = {
@@ -48,6 +52,7 @@ export const getOrders = new Elysia().use(authentication).get(
         perPage,
         total: ordersCount.count,
       },
+      total: Number(orderValue.value),
     }
 
     return result
