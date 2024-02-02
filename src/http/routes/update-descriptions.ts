@@ -19,7 +19,7 @@ const calcBalance = (balance: number, paragraphs: number) => {
   return balance - valueGeneration
 }
 
-export const createDescription = new Elysia().use(authentication).post(
+export const updateDescription = new Elysia().use(authentication).patch(
   '/descriptions',
   async ({ body, getLogin, set }) => {
     const openaiAPI = new OpenaiAPI()
@@ -67,13 +67,12 @@ export const createDescription = new Elysia().use(authentication).post(
     })
 
     await db
-      .insert(descriptions)
-      .values({
+      .update(descriptions)
+      .set({
         description: result.description,
         value: user.balance - calcBalance(user.balance, paragraphs),
-        productId,
-        userId: login,
       })
+      .where(eq(descriptions.productId, productId))
       .catch((error) => {
         throw new HumanizedError({
           status: 'error',

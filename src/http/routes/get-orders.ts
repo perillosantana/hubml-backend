@@ -2,7 +2,7 @@ import Elysia, { t } from 'elysia'
 import { authentication } from '../authentication'
 import { db } from '@/db/connection'
 import { z } from 'zod'
-import { and, count, eq, sum } from 'drizzle-orm'
+import { count, eq, sum } from 'drizzle-orm'
 import { orders } from '@/db/schema'
 
 export const getOrders = new Elysia().use(authentication).get(
@@ -12,34 +12,28 @@ export const getOrders = new Elysia().use(authentication).get(
 
     const login = await getLogin()
 
-    const { pageIndex, productId } = z
+    const { pageIndex } = z
       .object({
         pageIndex: z.coerce.number().default(0),
-        productId: z.coerce.string().default(''),
       })
       .parse(query)
 
     const baseQuery = db
       .select({
-        description: orders.description,
         value: orders.value,
-        productId: orders.productId,
-        createdIn: orders.createdIn,
+        status: orders.status,
+        ticketUrl: orders.ticketUrl,
+        expiration: orders.expiration,
+        created: orders.created,
       })
       .from(orders)
-      .where(() => {
-        if (!productId) {
-          return eq(orders.userId, login)
-        }
-
-        return and(eq(orders.userId, login), eq(orders.productId, productId))
-      })
+      .where(eq(orders.userId, login))
 
     const [ordersCount] = await db
       .select({ count: count() })
       .from(baseQuery.as('baseQuery'))
 
-    const [orderValue] = await db
+    const [ordersValue] = await db
       .select({ value: sum(orders.value) })
       .from(baseQuery.as('baseQuery'))
 
@@ -52,7 +46,7 @@ export const getOrders = new Elysia().use(authentication).get(
         perPage,
         total: ordersCount.count,
       },
-      total: Number(orderValue.value),
+      total: Number(ordersValue.value),
     }
 
     return result
@@ -60,7 +54,6 @@ export const getOrders = new Elysia().use(authentication).get(
   {
     query: t.Object({
       pageIndex: t.Optional(t.Numeric()),
-      productId: t.Optional(t.String()),
     }),
   },
 )

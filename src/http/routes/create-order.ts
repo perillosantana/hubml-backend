@@ -2,10 +2,14 @@ import Elysia, { t } from 'elysia'
 import { authentication } from '../authentication'
 import { MercadoPagoConfig, Payment } from 'mercadopago'
 import { env } from '@/env'
+import { db } from '@/db/connection'
+import { orders } from '@/db/schema'
 
-export const createPayment = new Elysia().use(authentication).post(
-  '/payment',
-  async ({ body }) => {
+export const createOrder = new Elysia().use(authentication).post(
+  '/orders',
+  async ({ body, getLogin }) => {
+    const login = await getLogin()
+
     const client = new MercadoPagoConfig({
       accessToken: env.MP_TOKEN,
     })
@@ -17,14 +21,27 @@ export const createPayment = new Elysia().use(authentication).post(
         transaction_amount: Number(body.value.replace(/[^0-9]/g, '')) / 100,
         payment_method_id: 'pix',
         payer: {
-          email: body.email,
+          email: login,
           identification: {
             type: 'CPF',
             number: body.document.replace(/[^a-zA-Z0-9]/g, ''),
           },
         },
-        description: body.email,
+        description: login,
       },
+    })
+
+    await db.insert(orders).values({
+      document: body.document,
+      value: Number(body.value.replace(/[^0-9]/g, '')),
+      codeImage:
+        createPayment.point_of_interaction?.transaction_data?.qr_code_base64,
+      code: createPayment.point_of_interaction?.transaction_data?.qr_code,
+      paymentId: String(createPayment.id),
+      ticketUrl:
+        createPayment.point_of_interaction?.transaction_data?.ticket_url,
+      expiration: createPayment.date_of_expiration,
+      userId: login,
     })
 
     return {
@@ -37,7 +54,6 @@ export const createPayment = new Elysia().use(authentication).post(
   },
   {
     body: t.Object({
-      email: t.String(),
       document: t.String(),
       value: t.String(),
     }),

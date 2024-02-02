@@ -6,7 +6,7 @@ import { env } from '@/env'
 import { getUser } from './routes/get-user'
 import { createUser } from './routes/create-user'
 import { updateUser } from './routes/update-user'
-import { getOrders } from './routes/get-orders'
+import { getDescriptions } from './routes/get-descriptions'
 import { getMlToken } from './routes/get-ml-token'
 import { getMlProducts } from './routes/get-ml-products'
 import { getMlProduct } from './routes/get-ml-product'
@@ -14,7 +14,8 @@ import { createDescription } from './routes/create-description'
 import { getMetrics } from './routes/get-metrics'
 import { updateMlProduct } from './routes/update-ml-product'
 import { getPaymentAuthorized } from './routes/get-payment-authorized'
-import { createPayment } from './routes/create-payment'
+import { createOrder } from './routes/create-order'
+import { getOrders } from './routes/get-orders'
 
 const app = new Elysia()
   .use(getPaymentAuthorized)
@@ -35,14 +36,15 @@ const app = new Elysia()
   .use(getUser)
   .use(createUser)
   .use(updateUser)
-  .use(getOrders)
+  .use(getDescriptions)
   .use(getMlToken)
   .use(getMlProducts)
   .use(getMlProduct)
   .use(createDescription)
   .use(getMetrics)
   .use(updateMlProduct)
-  .use(createPayment)
+  .use(createOrder)
+  .use(getOrders)
 
 app.listen(3003)
 

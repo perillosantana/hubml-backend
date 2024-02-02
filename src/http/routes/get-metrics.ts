@@ -2,7 +2,7 @@ import Elysia from 'elysia'
 import { authentication } from '../authentication'
 import { db } from '@/db/connection'
 import { and, count, eq, gte, lt, sql, sum } from 'drizzle-orm'
-import { orders } from '@/db/schema'
+import { descriptions } from '@/db/schema'
 import dayjs from 'dayjs'
 
 export const getMetrics = new Elysia()
@@ -13,31 +13,31 @@ export const getMetrics = new Elysia()
     const today = dayjs()
     const startOfLastMonth = today.subtract(1, 'month').startOf('month')
 
-    const ordersPerDay = await db
+    const descriptionsPerDay = await db
       .select({
-        dayOfMonth: sql<string>`TO_CHAR(${orders.createdIn}, 'YYYY-MM-DD')`,
-        amount: count(orders.id),
+        dayOfMonth: sql<string>`TO_CHAR(${descriptions.createdIn}, 'YYYY-MM-DD')`,
+        amount: count(descriptions.id),
       })
-      .from(orders)
+      .from(descriptions)
       .where(
         and(
-          eq(orders.userId, login),
-          gte(orders.createdIn, startOfLastMonth.toDate()),
-          lt(orders.createdIn, today.toDate()),
+          eq(descriptions.userId, login),
+          gte(descriptions.createdIn, startOfLastMonth.toDate()),
+          lt(descriptions.createdIn, today.toDate()),
         ),
       )
-      .groupBy(sql`TO_CHAR(${orders.createdIn}, 'YYYY-MM-DD')`)
+      .groupBy(sql`TO_CHAR(${descriptions.createdIn}, 'YYYY-MM-DD')`)
       .having(({ amount }) => gte(amount, 1))
 
-    const ordersTotalValue = await db
+    const descriptionsTotalValue = await db
       .select({
-        totalValue: sum(orders.value),
+        totalValue: sum(descriptions.value),
       })
-      .from(orders)
-      .where(and(eq(orders.userId, login)))
+      .from(descriptions)
+      .where(and(eq(descriptions.userId, login)))
 
     return {
-      ordersPerDay,
-      ordersTotalValue: Number(ordersTotalValue[0].totalValue || 0),
+      descriptionsPerDay,
+      descriptionsTotalValue: Number(descriptionsTotalValue[0].totalValue || 0),
     }
   })

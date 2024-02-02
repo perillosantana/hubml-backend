@@ -2,6 +2,8 @@ import { db } from '@/db/connection'
 import { HumanizedError } from '@/http/routes/errors/humanized-error'
 import { env } from 'bun'
 import MercadoLivreAuth from './MercadoLivreAuth'
+import { descriptions } from '@/db/schema'
+import { eq } from 'drizzle-orm'
 
 type SearchProductsProps = {
   urlParams: string
@@ -190,7 +192,21 @@ class MercadoLivreAPI {
       })
     }
 
-    return await response.json()
+    await db
+      .update(descriptions)
+      .set({
+        status: 'approved',
+      })
+      .where(eq(descriptions.productId, id))
+      .catch((error) => {
+        throw new HumanizedError({
+          status: 'error',
+          message: 'Erro ao atualizar a descrição',
+          systemMessage: error,
+        })
+      })
+
+    await response.json()
   }
 }
 

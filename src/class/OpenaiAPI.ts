@@ -1,16 +1,10 @@
-import { db } from '@/db/connection'
-import { orders, users } from '@/db/schema'
 import { env } from '@/env'
 import { HumanizedError } from '@/http/routes/errors/humanized-error'
-import { eq } from 'drizzle-orm'
 import OpenAI from 'openai'
 
 type GenerateProps = {
   description: string
   paragraphs: number
-  productId: string
-  login: string
-  balance: number
 }
 
 class OpenaiAPI {
@@ -22,24 +16,7 @@ class OpenaiAPI {
     })
   }
 
-  private calcBalance = (balance: number, paragraphs: number) => {
-    const valueGeneration = Number(env.VALUE_GENERATION)
-    const valueParagraph = Number(env.VALUE_PARAGRAPH)
-
-    if (paragraphs > 1) {
-      return balance - valueGeneration - valueParagraph * (paragraphs - 1)
-    }
-
-    return balance - valueGeneration
-  }
-
-  async generate({
-    login,
-    description,
-    paragraphs,
-    productId,
-    balance,
-  }: GenerateProps) {
+  async generate({ description, paragraphs }: GenerateProps) {
     const response = await this.openai.chat.completions
       .create({
         messages: [
@@ -62,22 +39,7 @@ class OpenaiAPI {
         })
       })
 
-    await db
-      .update(users)
-      .set({
-        balance: this.calcBalance(balance, paragraphs),
-      })
-      .where(eq(users.login, login))
-
-    await db.insert(orders).values({
-      description: response.choices[0].message.content,
-      value: balance - this.calcBalance(balance, paragraphs),
-      productId,
-      userId: login,
-    })
-
     return {
-      value: balance - this.calcBalance(balance, paragraphs),
       description: response.choices[0].message.content,
     }
   }

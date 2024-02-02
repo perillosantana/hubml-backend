@@ -7,10 +7,17 @@ export const orders = pgTable('orders', {
   id: text('id')
     .$defaultFn(() => createId())
     .primaryKey(),
-  description: text('description'),
+  document: text('document'),
   value: integer('value'),
-  productId: text('product_id'),
-  createdIn: timestamp('created_in').defaultNow(),
+  status: text('status')
+    .$type<'pending' | 'approved' | 'canceled'>()
+    .default('pending'),
+  codeImage: text('code_image'),
+  code: text('code'),
+  paymentId: text('payment_id'),
+  ticketUrl: text('ticket_url'),
+  expiration: text('expiration'),
+  created: timestamp('created').defaultNow(),
   userId: text('login').references(() => users.login),
 })
 

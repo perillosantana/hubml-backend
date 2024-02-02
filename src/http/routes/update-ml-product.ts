@@ -4,15 +4,17 @@ import MercadoLivreAPI from '@/class/MercadoLivreAPI'
 
 export const updateMlProduct = new Elysia().use(authentication).patch(
   '/ml/products/:id',
-  async ({ body, getLogin, params }) => {
+  async ({ body, getLogin, params, set }) => {
     const login = await getLogin()
     const mercadoLivreAPI = new MercadoLivreAPI()
 
-    return await mercadoLivreAPI.updateProduct({
+    await mercadoLivreAPI.updateProduct({
       description: body.description,
       id: params.id,
       login,
     })
+
+    set.status = 204
   },
   {
     params: t.Object({
