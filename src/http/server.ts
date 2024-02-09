@@ -16,6 +16,7 @@ import { updateMlProduct } from './routes/update-ml-product'
 import { getPaymentAuthorized } from './routes/get-payment-authorized'
 import { createOrder } from './routes/create-order'
 import { getOrders } from './routes/get-orders'
+import { updateDescription } from './routes/update-descriptions'
 
 const app = new Elysia()
   .use(getPaymentAuthorized)
@@ -41,6 +42,7 @@ const app = new Elysia()
   .use(getMlProducts)
   .use(getMlProduct)
   .use(createDescription)
+  .use(updateDescription)
   .use(getMetrics)
   .use(updateMlProduct)
   .use(createOrder)
