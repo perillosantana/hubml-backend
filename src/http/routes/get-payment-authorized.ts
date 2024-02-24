@@ -1,4 +1,7 @@
+import { db } from '@/db/connection'
+import { orders, users } from '@/db/schema'
 import { env } from '@/env'
+import { eq } from 'drizzle-orm'
 import Elysia from 'elysia'
 import { MercadoPagoConfig, Payment } from 'mercadopago'
 
@@ -16,7 +19,7 @@ type RequestBodyResult = {
 }
 export const getPaymentAuthorized = new Elysia().post(
   '/payment-authorized',
-  async ({ body }) => {
+  async ({ body, set }) => {
     const client = new MercadoPagoConfig({
       accessToken: env.MP_TOKEN,
     })
@@ -30,6 +33,50 @@ export const getPaymentAuthorized = new Elysia().post(
     }
 
     const getPayment = await payment.get({ id: result.data.id })
-    return getPayment
+
+    if (getPayment.status?.toLowerCase() === 'approved') {
+      const order = await db.query.orders.findFirst({
+        columns: {
+          userId: true,
+          value: true,
+        },
+        where(fields, { eq }) {
+          return eq(fields.paymentId, result.data.id)
+        },
+      })
+
+      if (order && order?.userId && order?.value) {
+        const login = order.userId
+
+        const user = await db.query.users.findFirst({
+          columns: {
+            balance: true,
+          },
+          where(fields, { eq }) {
+            return eq(fields.login, login)
+          },
+        })
+
+        if (!user?.balance) {
+          return
+        }
+
+        await db
+          .update(orders)
+          .set({
+            status: 'approved',
+          })
+          .where(eq(orders.paymentId, result.data.id))
+
+        await db
+          .update(users)
+          .set({
+            balance: user?.balance + order.value,
+          })
+          .where(eq(users.login, login))
+      }
+    }
+
+    set.status = 204
   },
 )

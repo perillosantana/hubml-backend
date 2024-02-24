@@ -71,6 +71,7 @@ export const updateDescription = new Elysia().use(authentication).patch(
       .set({
         description: result.description,
         value: user.balance - calcBalance(user.balance, paragraphs),
+        status: 'pending',
       })
       .where(eq(descriptions.productId, productId))
       .catch((error) => {
