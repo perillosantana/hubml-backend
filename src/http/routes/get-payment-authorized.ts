@@ -61,19 +61,22 @@ export const getPaymentAuthorized = new Elysia().post(
           return
         }
 
-        await db
-          .update(orders)
-          .set({
-            status: 'approved',
-          })
-          .where(eq(orders.paymentId, result.data.id))
+        const newBalance = user?.balance + order.value
 
-        await db
-          .update(users)
-          .set({
-            balance: user?.balance + order.value,
-          })
-          .where(eq(users.login, login))
+        await db.transaction(async () => {
+          await db
+            .update(orders)
+            .set({
+              status: 'approved',
+            })
+            .where(eq(orders.paymentId, result.data.id))
+          await db
+            .update(users)
+            .set({
+              balance: newBalance,
+            })
+            .where(eq(users.login, login))
+        })
       }
     }
 
