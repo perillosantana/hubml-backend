@@ -4,6 +4,7 @@ import { env } from '@/env'
 import { eq } from 'drizzle-orm'
 import Elysia from 'elysia'
 import { MercadoPagoConfig, Payment } from 'mercadopago'
+import { HumanizedError } from './errors/humanized-error'
 
 type RequestBodyResult = {
   action: string
@@ -35,18 +36,17 @@ export const getPaymentAuthorized = new Elysia().post(
     const getPayment = await payment.get({ id: result.data.id })
 
     if (getPayment.status?.toLowerCase() === 'approved') {
-      const order = await db.query.orders.findFirst({
-        columns: {
-          userId: true,
-          value: true,
-        },
-        where(fields, { eq }) {
-          return eq(fields.paymentId, result.data.id)
-        },
-      })
+      const order = await db
+        .select({
+          user: orders.userId,
+          value: orders.value,
+          status: orders.status,
+        })
+        .from(orders)
+        .where(eq(orders.paymentId, result.data.id))
 
-      if (order && order?.userId && order?.value) {
-        const login = order.userId
+      if (order.length && order[0].user && order[0].value) {
+        const login = order[0].user
 
         const user = await db.query.users.findFirst({
           columns: {
@@ -58,10 +58,14 @@ export const getPaymentAuthorized = new Elysia().post(
         })
 
         if (!user?.balance) {
-          return
+          throw new HumanizedError({
+            status: 'error',
+            message: 'Erro ao procurar o saldo do usuário',
+            systemMessage: '',
+          })
         }
 
-        const newBalance = user?.balance + order.value
+        const newBalance = user?.balance + order[0].value
 
         await db.transaction(async () => {
           await db
@@ -70,6 +74,7 @@ export const getPaymentAuthorized = new Elysia().post(
               status: 'approved',
             })
             .where(eq(orders.paymentId, result.data.id))
+
           await db
             .update(users)
             .set({
