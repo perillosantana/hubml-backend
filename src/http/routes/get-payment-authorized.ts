@@ -4,7 +4,6 @@ import { env } from '@/env'
 import { eq } from 'drizzle-orm'
 import Elysia from 'elysia'
 import { MercadoPagoConfig, Payment } from 'mercadopago'
-import { HumanizedError } from './errors/humanized-error'
 
 type RequestBodyResult = {
   action: string
@@ -36,38 +35,23 @@ export const getPaymentAuthorized = new Elysia().post(
     const getPayment = await payment.get({ id: result.data.id })
 
     if (getPayment.status?.toLowerCase() === 'approved') {
-      const order = await db
+      const userAndOrder = await db
         .select({
           user: orders.userId,
           value: orders.value,
           status: orders.status,
+          balance: users.balance,
         })
-        .from(orders)
+        .from(users)
         .where(eq(orders.paymentId, result.data.id))
+        .leftJoin(orders, eq(users.login, orders.userId))
 
-      if (order.length && order[0].user && order[0].value) {
-        const login = order[0].user
+      if (userAndOrder.length) {
+        const { user, value, status, balance } = userAndOrder[0]
 
-        const user = await db.query.users.findFirst({
-          columns: {
-            balance: true,
-          },
-          where(fields, { eq }) {
-            return eq(fields.login, login)
-          },
-        })
+        if (user && value && balance && status !== 'approved') {
+          const newBalance = balance + value
 
-        if (!user?.balance) {
-          throw new HumanizedError({
-            status: 'error',
-            message: 'Erro ao procurar o saldo do usuário',
-            systemMessage: '',
-          })
-        }
-
-        const newBalance = user?.balance + order[0].value
-
-        await db.transaction(async () => {
           await db
             .update(orders)
             .set({
@@ -80,8 +64,8 @@ export const getPaymentAuthorized = new Elysia().post(
             .set({
               balance: newBalance,
             })
-            .where(eq(users.login, login))
-        })
+            .where(eq(users.login, user))
+        }
       }
     }
 
