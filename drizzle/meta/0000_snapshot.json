@@ -1,5 +1,5 @@
 {
-  "id": "de32567c-c91e-41fc-8a06-d1934e413f7c",
+  "id": "27c3f977-1aac-488f-9eb0-aa8d98470ba0",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -145,13 +145,13 @@
         },
         "ticket_url": {
           "name": "ticket_url",
-          "type": "timestamp",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
         "expiration": {
           "name": "expiration",
-          "type": "timestamp",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },

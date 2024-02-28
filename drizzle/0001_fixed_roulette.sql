@@ -1,1 +1,0 @@
-ALTER TABLE "orders" ALTER COLUMN "ticket_url" SET DATA TYPE text;

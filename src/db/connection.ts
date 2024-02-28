@@ -6,6 +6,9 @@ import * as schema from './schema'
 const client = postgres(env.DB_URL, {
   user: env.DB_USERNAME,
   password: env.DB_PASSWORD,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 })
 
 export const db = drizzle(client, { schema })

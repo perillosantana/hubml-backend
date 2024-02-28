@@ -28,8 +28,8 @@ CREATE TABLE IF NOT EXISTS "orders" (
 	"code_image" text,
 	"code" text,
 	"payment_id" text,
-	"ticket_url" timestamp,
-	"expiration" timestamp,
+	"ticket_url" text,
+	"expiration" text,
 	"created" timestamp DEFAULT now(),
 	"login" text
 );

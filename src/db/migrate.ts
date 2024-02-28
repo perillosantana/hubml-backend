@@ -10,6 +10,9 @@ const connection = postgres(env.DB_URL, {
   max: 1,
   user: env.DB_USERNAME,
   pass: env.DB_PASSWORD,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 })
 const db = drizzle(connection)
 
