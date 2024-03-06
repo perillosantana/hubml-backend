@@ -1,8 +1,11 @@
 [phases.setup]
-nixPkgs = ['bun', 'pnpm']
+nixPkgs = ['bun']
 
 [phases.install]
 cmds = ['bun i --frozen-lockfile']
 
 [phases.build]
 cmds = ['bun install && bun build ./src/http/server.ts --outdir ./dist --target bun --entry-naming index.js']
+
+[start]
+cmd = 'bun ./dist/index.js'
