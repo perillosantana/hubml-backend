@@ -38,5 +38,6 @@
     "pg": "^8.11.3",
     "typescript": "^5.3.3"
   },
-  "module": "src/index.js"
+  "module": "src/index.js",
+  "packageManager": "pnpm@7.7.0"
 }
