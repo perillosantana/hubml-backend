@@ -23,6 +23,7 @@ export const getMlProducts = new Elysia().use(authentication).get(
     urlParams.append('query', search)
     urlParams.append('offset', String(pageIndex * 2))
     urlParams.append('limit', String(2))
+    urlParams.append('status', 'active')
 
     const products = await mercadoLivreAPI.searchProducts({
       urlParams: urlParams.toString(),

@@ -2,7 +2,7 @@ import Elysia, { t } from 'elysia'
 import { authentication } from '../authentication'
 import { db } from '@/db/connection'
 import { z } from 'zod'
-import { and, count, eq, sum } from 'drizzle-orm'
+import { and, count, desc, eq, sum } from 'drizzle-orm'
 import { descriptions } from '@/db/schema'
 
 export const getDescriptions = new Elysia().use(authentication).get(
@@ -50,6 +50,7 @@ export const getDescriptions = new Elysia().use(authentication).get(
     const allDescriptions = await baseQuery
       .offset(pageIndex * perPage)
       .limit(perPage)
+      .orderBy(desc(descriptions.createdIn))
 
     const result = {
       descriptions: allDescriptions,

@@ -50,6 +50,6 @@ const app = new Elysia()
 
 app.listen(3003)
 
-console.log('Server start');
+console.log('Server start')
 
 export default app
